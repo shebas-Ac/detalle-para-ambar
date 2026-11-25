@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>con mucho cariño para ti ambar🤍</title>
+    <link id="favicon-emilia" rel="icon" type="image/png" href="">
+        <link href="https://googleapis.com" rel="stylesheet">
+    <style>
+        /* Efecto de brillo suave al pasar el mouse por las frases */
+.frase-interactiva {
+  cursor: pointer;
+  transition: transform 0.3s ease, filter 0.3s ease, text-shadow 0.3s ease;
+}
+
+.frase-interactiva:hover {
+  transform: scale(1.08);
+  filter: brightness(1.3);
+}
+
+/* Fondo oscuro difuminado detrás de la carta */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(5, 5, 16, 0.72);
+  backdrop-filter: blur(6px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+  padding: 20px;
+}
+
+.modal-overlay.activo {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* Tarjeta de la carta con el color dinámico de la frase */
+.carta-frase {
+  --card-color: #ffffff;
+  background: rgba(15, 16, 36, 0.92);
+  border: 1.5px solid var(--card-color);
+  box-shadow: 0 0 28px color-mix(in srgb, var(--card-color) 45%, transparent),
+              inset 0 0 18px color-mix(in srgb, var(--card-color) 15%, transparent);
+  border-radius: 18px;
+  max-width: 460px;
+  width: 100%;
+  padding: 28px 26px;
+  text-align: center;
+  color: #f4f4f9;
+  transform: translateY(22px) scale(0.94);
+  opacity: 0;
+  transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1),
+              opacity 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.modal-overlay.activo .carta-frase {
+  transform: translateY(0) scale(1);
+  opacity: 1;
+}
+
+.carta-frase h3 {
+  margin: 0 0 14px;
+  font-size: 1.35rem;
+  color: var(--card-color);
+  text-shadow: 0 0 12px color-mix(in srgb, var(--card-color) 65%, transparent);
+  text-transform: capitalize;
+}
+
+.carta-frase p {
+  margin: 0 0 22px;
+  font-size: 1.05rem;
+  line-height: 1.6;
+  color: #e6e8f5;
+}
+
+.btn-cerrar-carta {
+  background: transparent;
+  color: var(--card-color);
+  border: 1px solid var(--card-color);
+  padding: 8px 22px;
+  border-radius: 999px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: background 0.3s ease, color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.btn-cerrar-carta:hover {
+  background: var(--card-color);
+  color: #0b0c1d;
+  box-shadow: 0 0 15px var(--card-color);
+}
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            width: 100vw; height: 100vh; overflow: hidden; position: relative;
+            background: #000000;
+            color: white; cursor: grab; user-select: none; font-family: 'Playfair Display', serif;
+        }
+        body:active { cursor: grabbing; }
+        @keyframes aparecerTitulo {
+            from { opacity: 0; transform: translate(-50%, 25px) scale(0.92); }
+            to { opacity: 1; transform: translate(-50%, 0) scale(1); }
+        }
+        .titulo-top {
+            position: fixed; top: 24px; left: 50%; transform: translateX(-50%); z-index: 100;
+            font-size: 2.8rem; font-weight: 800; color: #ffffff; white-space: nowrap; pointer-events: none;
+            text-shadow: 0 0 12px #5ce1e6, 0 0 30px #0088ff, 0 2px 8px #000;
+            animation: aparecerTitulo 1.2s ease-out forwards;
+        }
+        #canvas-universo { position: fixed; inset: 0; width: 100%; height: 100%; z-index: 1; }
+        .btn-interrogacion {
+            position: fixed; bottom: 24px; right: 24px; width: 60px; height: 60px; border-radius: 50%;
+            background: radial-gradient(circle at 30% 30%, #ffffff, #5ce1e6); border: 2px solid #030712;
+            box-shadow: 0 0 20px #5ce1e6; z-index: 120; cursor: pointer; font-size: 2rem;
+            font-weight: 900; color: #000000; font-family: sans-serif;
+            display: flex; align-items: center; justify-content: center; transition: transform 0.3s ease;
+        }
+        .btn-interrogacion:hover { transform: scale(1.12); }
+        #modal-carta {
+            position: fixed; inset: 0; background: rgba(2, 6, 16, 0.85); backdrop-filter: blur(8px);
+            z-index: 200; display: none; align-items: center; justify-content: center; padding: 20px;
+        }
+        .caja-carta {
+            background: #0a1931; border: 1px solid #5ce1e6; box-shadow: 0 0 30px rgba(92, 225, 230, 0.4);
+            border-radius: 18px; padding: 30px; max-width: 460px; text-align: center;
+        }
+        .caja-carta h2 { color: #5ce1e6; margin-bottom: 12px; }
+        .caja-carta p { line-height: 1.6; color: #e0f7fa; margin-bottom: 20px; }
+        .cerrar-carta {
+            padding: 8px 22px; background: #5ce1e6; color: #030712; border: none;
+            border-radius: 15px; font-weight: bold; cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div class="titulo-top">UNA GALAXIA HECHA DE TI</div>
+       <audio id="musica-galaxia" loop preload="auto"></audio>
+    <script>if (!window.location.search.includes('sinmusica')) document.getElementById('musica-galaxia').src = 'musica.mp3';</script>
+
+    <canvas id="canvas-universo"></canvas>
+        <button type="button" class="btn-interrogacion" onclick="var m=document.getElementById('modal-carta'); var c=m.querySelector('.caja-carta'); m.style.display='flex'; m.style.opacity='0'; c.style.transform='scale(0.88) translateY(14px)'; setTimeout(function(){ m.style.opacity='1'; c.style.transform='scale(1) translateY(0)'; }, 20);" style="position:fixed; bottom:24px; right:24px; width:54px; height:54px; border-radius:50%; background:radial-gradient(circle at 30% 30%, #2b1e4a, #090d1f 75%); border:2px solid #7ef9ff; outline:2px dashed rgba(192,108,255,0.65); outline-offset:4px; box-shadow:0 0 18px rgba(126,249,255,0.65), inset 0 0 12px rgba(192,108,255,0.75); color:#ffffff; font-family:'Cinzel', serif; font-style:normal; font-weight:700; font-size:1.55rem; text-shadow:0 0 8px #7ef9ff, 0 0 16px #c06cff; cursor:pointer; display:flex; align-items:center; justify-content:center; z-index:120;">?<span style="position:absolute; top:-6px; right:-4px; font-size:0.75rem; color:#7ef9ff; text-shadow:0 0 6px #fff;">✦</span><span style="position:absolute; bottom:-5px; left:-3px; font-size:0.65rem; color:#c06cff; text-shadow:0 0 6px #fff;">✦</span></button>
+        <div id="modal-carta" onclick="var c=this.querySelector('.caja-carta'); this.style.opacity='0'; c.style.transform='scale(0.92) translateY(10px)'; var self=this; setTimeout(function(){ self.style.display='none'; }, 420);" style="transition: opacity 0.45s ease; cursor: pointer;">
+        <div class="caja-carta" style="border: 1px solid rgba(126, 249, 255, 0.25); box-shadow: 0 0 18px rgba(126, 249, 255, 0.12); transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1); cursor: default;">
+            <h2>Para ti Ambar🤍</h2>
+            <p>Quería hacerte este pequeño detalle por cada momento compartido, por lo increíble que eres y porque desde que llegaste te volviste alguien demasiado especial para mí. ¡Feliz cumpleaños!</p>
+        </div>
+    </div>
+
+    <script>
+        var canvas = document.getElementById('canvas-universo');
+        var ctx = canvas.getContext('2d');
+        var w = canvas.width = window.innerWidth;
+        var h = canvas.height = window.innerHeight;
+        window.addEventListener('resize', function() { w = canvas.width = window.innerWidth; h = canvas.height = window.innerHeight; });
+
+        var imgCentro = new Image(); imgCentro.src = 'centro.png';
+        var imgOrb1 = new Image(); imgOrb1.src = 'orbita1.png';
+        var imgOrb2 = new Image(); imgOrb2.src = 'orbita2.png';
+        var imgOrb3 = new Image(); imgOrb3.src = 'orbita3.png';
+
+        var estrellas = new Set();
+        for (var i = 0; i < 700; i++) estrellas.add({ x: Math.random() * w, y: Math.random() * h, r: Math.random() * 1.6 + 0.4, fase: i });
+
+               // Galaxia: Violeta por dentro -> Azul en medio -> Blanco por fuera + Letra "A" de Ambar
+                // Galaxia con 3 brazos definidos + polvo estelar 3D suelto entre brazos (como en tu captura)
+                // Brazos estilizados de curva larga + polvo estelar en los espacios oscuros (como en tu captura)
+        var anillo = new Set();
+        for (var a = 0; a < 20000; a++) {
+            var prog = Math.pow(Math.random(), 0.85);
+            var radio = 95 + prog * 880;
+            var esPolvoSuelto = (a % 12 === 0); // 33% polvo estelar suelto en los espacios oscuros
+
+            if (esPolvoSuelto) {
+                var angLibre = Math.random() * Math.PI * 2;
+                var yPolvo = 85 + (Math.random() - 0.5) * 40;
+                anillo.add({ x: Math.cos(angLibre) * radio, y: yPolvo, z: Math.sin(angLibre) * radio, borde: 0.35, esLetra: false });
+            } else {
+                var brazo = (a % 3) * ((Math.PI * 2) / 3);
+                var offset = ((Math.random() + Math.random() + Math.random()) / 3 - 0.5) * 2;
+                // Brazos más delgados (0.28) y curva más larga (5.4) para dejar espacio limpio entre brazos
+                var ang = prog * 5.4 + brazo + offset * (0.46 + prog * 0.22);
+                var yAltura = 85 + ((Math.random() + Math.random()) / 2 - 0.5) * (24 * (1 - prog * 0.4));
+                anillo.add({ x: Math.cos(ang) * radio, y: yAltura, z: Math.sin(ang) * radio, borde: Math.abs(offset), esLetra: false });
+            }
+        }
+
+
+               // Letra "A" acostada boca arriba en el centro de la galaxia (debajo de Emilia)
+        for (var k = 0; k < 320; k++) {
+            var lx = 0, lz = 0;
+            var ladoA = k % 3;
+            var t = Math.random();
+            if (ladoA === 0) {
+                lx = -46 * t;
+                lz = -45 + t * 90;
+            } else if (ladoA === 1) {
+                lx = 46 * t;
+                lz = -45 + t * 90;
+            } else {
+                lx = -24 + t * 48;
+                lz = 8;
+            }
+            lx += (Math.random() - 0.5) * 5;
+            lz += (Math.random() - 0.5) * 5;
+            var ly = 82 + (Math.random() - 0.5) * 4;
+            anillo.add({ x: lx, y: ly, z: lz, borde: 0, esLetra: true });
+        }
+
+                                    // Tus 20 frases únicas
+        var listaFrases = new Map([
+            [0, 'lo analítica que eres'],
+            [1, 'tu forma de ver el mundo'],
+            [2, 'cada charla contigo'],
+            [3, 'lo única que eres'],
+            [4, 'lo competitiva que eres'],
+            [5, 'tu gusto por los animales'],
+            [6, 'lo estudiosa y dedicada que eres'],
+            [7, 'tu valentía ante todo'],
+            [8, 'lo admirable que puedes ser'],
+            [9, 'cuando jugabamos juntos'],
+            [10, 'tu humor'],
+            [11, 'tu pasión'],
+            [12, 'tu belleza incluso sin haberla visto'],
+            [13, 'tu increíble inteligencia'],
+            [14, 'tu autenticidad y sencillez'],
+            [15, 'como haces que el tiempo pase volando'],
+            [16, 'los gustos que compartimos'],
+            [17, 'lo fiel que eres contigo misma'],
+            [18, 'tu sinceridad'],
+            [19, 'la paz que da hablar contigo']
+        ]);
+
+        // 20 colores únicos distintos (cero repeticiones)
+        var coloresUnicos = new Map([
+            [0, '#ffffff'],
+            [1, '#5ce1e6'],
+            [2, '#c89bff'],
+            [3, '#8ce8ff'],
+            [4, '#ffb8e6'],
+            [5, '#7ef9c8'],
+            [6, '#ffd180'],
+            [7, '#82b1ff'],
+            [8, '#ea80fc'],
+            [9, '#a7ffeb'],
+            [10, '#fff59d'],
+            [11, '#ff8a80'],
+            [12, '#b388ff'],
+            [13, '#80d8ff'],
+            [14, '#f8bbd0'],
+            [15, '#64ffda'],
+            [16, '#ffe57f'],
+            [17, '#8c9eff'],
+            [18, '#ff80ab'],
+            [19, '#b9f6ca']
+        ]);
+var explicacionesFrases = new Map([
+  [0, 'Porque nunca te quedas en lo superficial, siempre piensas más allá y ves detalles que otros pasan por alto.'],
+  [1, 'Porque siempre tienes un punto de vista realista, distinto e interesante sobre las cosas.'],
+  [2, 'Porque aunque sea un rato corto o hablando cualquier cosa, conversar contigo siempre es natural.'],
+  [3, 'Porque tienes tu propio estilo, tus propias ideas y una personalidad que no se parece a la de nadie más.'],
+  [4, 'Porque cuando estás en partida te concentras al máximo y siempre das lo mejor de ti hasta el final.'],
+  [5, 'Porque el cariño que les tienes a Bruno y a Tommy lo refleja.'],
+  [6, 'Porque cuando te propones algo ya sea en la universidad o en cualquier cosa le metes todo tu esfuerzo y enfoque y los resultados se notan.'],
+  [7, 'Porque no te achicas ante las cosas difíciles y sigues adelante con firmeza incluso si las cosas se ponen complicadas.'],
+  [8, 'Porque tu disciplina, tu claridad mental y la forma en que enfrentas las cosas realmente inspiran admiración.'],
+  [9, 'Porque esas partidas juntos en equipo y los buenos ratos compartidos siempre dejan muy buenos recuerdos.'],
+  [10, 'Porque cuando te sueltas a bromear o te ríes de la nada, le pones un toque súper divertido a cualquier charla.'],
+  [11, 'Porque cuando algo te gusta o te importa de verdad, lo vives y lo disfrutas con todo.'],
+  [12, 'Porque la verdadera belleza está en la mente, en la esencia y en la forma de ser de una persona, y tú la transmites cada vez que hablas.'],
+  [13, 'Porque se nota en cada tema que dominas, en tus estudios y en lo rápido que captas cualquier cosa.'],
+  [14, 'Porque no finges ser alguien que no eres para agradar, siempre te muestras tal cual eres sin filtros.'],
+  [15, 'Porque cuando nos ponemos a charlar o bromear las horas pasan sin que uno se dé cuenta.'],
+  [16, 'Porque siempre es chévere coincidir en juegos, humor y forma de ver las cosas.'],
+  [17, 'Porque no cambias tu forma de ser ni tus valores por encajar con nadie, y esa seguridad en ti misma vale oro.'],
+  [18, 'Porque dices las cosas de frente y sin rodeos, y con alguien así siempre se sabe donde uno pisa.'],
+  [19, 'Porque tienes esa calma propia que hace que conversar contigo se sienta ligero y tranquilo.']
+]);
+
+function abrirCarta(indice) {
+  var titulo = listaFrases.get(indice);
+  var texto = explicacionesFrases.get(indice);
+  var color = coloresUnicos.get(indice) || '#ffffff';
+
+  var carta = document.getElementById('cartaContenido');
+  carta.style.setProperty('--card-color', color);
+  document.getElementById('cartaTitulo').textContent = titulo;
+  document.getElementById('cartaTexto').textContent = texto;
+
+  document.getElementById('modalFrase').classList.add('activo');
+}
+
+function cerrarCarta() {
+  document.getElementById('modalFrase').classList.remove('activo');
+}
+
+// También permite cerrar presionando la tecla Escape
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') cerrarCarta();
+});
+        // 20 frases repartidas en los 360 grados + 16 stickers orbitales
+        var objetos3D = new Set();
+        for (var f = 0; f < 36; f++) {
+            var esImg = (f >= 20);
+            var angOrb = esImg
+                ? ((f - 20) / 16) * Math.PI * 2 + 0.18
+                : (f / 20) * Math.PI * 2;
+            var radOrb = esImg
+                ? 260 + ((f - 20) % 4) * 145
+                : 310 + ((f * 137) % 460);
+            var numImg = (f % 3 === 0) ? 1 : (f % 3 === 1 ? 2 : 3);
+            objetos3D.add({
+                x: Math.cos(angOrb) * radOrb,
+                y: 80 + ((f % 3) - 1) * 18,
+                z: Math.sin(angOrb) * radOrb,
+                esImg: esImg,
+                numImg: numImg,
+                texto: esImg ? '' : listaFrases.get(f),
+                color: esImg ? '#ffffff' : coloresUnicos.get(f)
+            });
+        }
+
+        // 20 colores únicos distintos (uno exclusivo para cada frase, cero repeticiones)
+        var coloresUnicos = new Map([
+            [0, '#ffffff'],  // Blanco puro
+            [1, '#5ce1e6'],  // Cian hielo
+            [2, '#c89bff'],  // Violeta amatista
+            [3, '#8ce8ff'],  // Celeste brillante
+            [4, '#ffb8e6'],  // Rosa pastel
+            [5, '#7ef9c8'],  // Verde menta neón
+            [6, '#ffd180'],  // Dorado cálido suave
+            [7, '#82b1ff'],  // Azul zafiro claro
+            [8, '#ea80fc'],  // Lila luminoso
+            [9, '#a7ffeb'],  // Aguamarina claro
+            [10, '#fff59d'], // Amarillo estrella suave
+            [11, '#ff8a80'], // Coral luminoso
+            [12, '#b388ff'], // Lavanda intenso
+            [13, '#80d8ff'], // Azul cielo neón
+            [14, '#f8bbd0'], // Rosa cuarzo suave
+            [15, '#64ffda'], // Turquesa vibrante
+            [16, '#ffe57f'], // Ámbar estelar
+            [17, '#8c9eff'], // Índigo celestial
+            [18, '#ff80ab'], // Rosa neón sutil
+            [19, '#b9f6ca']  // Verde aurora suave
+        ]);
+
+                // 20 frases repartidas en 20 sectores fijos de 18° (cubre arriba, derecha, abajo e izquierda sin huecos)
+        var objetos3D = new Set();
+        for (var f = 0; f < 36; f++) {
+            var esImg = (f >= 20);
+            var angOrb = esImg
+                ? ((f - 20) / 16) * Math.PI * 2 + 0.16
+                : (f / 20) * Math.PI * 2; // 1 frase exacta cada 18° alrededor de todo el círculo
+                        var radOrb = esImg
+                ? 260 + ((f - 20) % 4) * 145
+                : 310 + ((f * 137) % 460);
+            var numImg = (f % 3 === 0) ? 1 : (f % 3 === 1 ? 2 : 3);
+            objetos3D.add({
+                x: Math.cos(angOrb) * radOrb,
+                y: 80 + ((f % 3) - 1) * 18,
+                z: Math.sin(angOrb) * radOrb,
+                esImg: esImg,
+                numImg: numImg,
+                texto: esImg ? '' : listaFrases.get(f),
+                color: esImg ? '#ffffff' : coloresUnicos.get(f)
+            });
+        }
+
+
+        // 15 colores únicos distintos (uno exclusivo para cada frase, cero repeticiones)
+        var coloresUnicos = new Map([
+            [0, '#ffffff'],  // Blanco puro
+            [1, '#5ce1e6'],  // Cian hielo
+            [2, '#c89bff'],  // Violeta amatista
+            [3, '#8ce8ff'],  // Celeste brillante
+            [4, '#ffb8e6'],  // Rosa pastel
+            [5, '#7ef9c8'],  // Verde menta neón
+            [6, '#ffd180'],  // Dorado cálido suave
+            [7, '#82b1ff'],  // Azul zafiro claro
+            [8, '#ea80fc'],  // Lila luminoso
+            [9, '#a7ffeb'],  // Aguamarina claro
+            [10, '#fff59d'], // Amarillo estrella suave
+            [11, '#ff8a80'], // Coral luminoso
+            [12, '#b388ff'], // Lavanda intenso
+            [13, '#80d8ff'], // Azul cielo neón
+            [14, '#f8bbd0']  // Rosa cuarzo suave
+        ]);
+
+        // 15 frases únicas (cada una con su color exclusivo) + 15 stickers orbitales en 3D
+               // 20 frases repartidas en los 360 grados + 16 stickers orbitales (sin corchetes)
+        var objetos3D = new Set();
+        for (var f = 0; f < 36; f++) {
+            var esImg = (f >= 20);
+            var angOrb = esImg
+                ? ((f - 20) / 16) * Math.PI * 2 + 0.18
+                : (f / 20) * Math.PI * 2;
+            var radOrb = esImg
+                ? 260 + ((f - 20) % 4) * 145
+                : 310 + ((f * 137) % 460);
+            var numImg = (f % 3 === 0) ? 1 : (f % 3 === 1 ? 2 : 3);
+            objetos3D.add({
+                x: Math.cos(angOrb) * radOrb,
+                indice: f,
+                y: 80 + ((f % 3) - 1) * 18,
+                z: Math.sin(angOrb) * radOrb,
+                esImg: esImg,
+                numImg: numImg,
+                texto: esImg ? '' : listaFrases.get(f),
+                color: esImg ? '#ffffff' : coloresUnicos.get(f)
+            });
+        }
+
+        var rotY = 0, rotX = 0.28, zoom = 0.85, arrastrando = false, seMovio = false, px = 0, py = 0, tiempo = 0;
+var mouseX = -9999, mouseY = -9999, fraseHover = null;
+
+window.addEventListener('mousedown', function(e) {
+    if (document.getElementById('modalFrase').classList.contains('activo')) return;
+    arrastrando = true; seMovio = false; px = e.clientX; py = e.clientY;
+});
+
+window.addEventListener('mouseup', function() {
+    if (arrastrando && !seMovio && fraseHover !== null) {
+        abrirCarta(fraseHover.indice);
+    }
+    arrastrando = false;
+});
+
+window.addEventListener('mousemove', function(e) {
+    mouseX = e.clientX; mouseY = e.clientY;
+    if (arrastrando) {
+        if (Math.abs(e.clientX - px) > 3 || Math.abs(e.clientY - py) > 3) seMovio = true;
+        rotY += (e.clientX - px) * 0.006;
+        rotX = Math.max(-1.1, Math.min(1.1, rotX + (e.clientY - py) * 0.006));
+        px = e.clientX; py = e.clientY;
+        return;
+    }
+    fraseHover = null;
+    objetos3D.forEach(function(obj) {
+        if (!obj.esImg && obj.hitBox) {
+            if (mouseX >= obj.hitBox.x1 && mouseX <= obj.hitBox.x2 &&
+                mouseY >= obj.hitBox.y1 && mouseY <= obj.hitBox.y2) {
+                fraseHover = obj;
+            }
+        }
+    });
+    document.body.style.cursor = fraseHover ? 'pointer' : 'grab';
+});
+
+window.addEventListener('wheel', function(e) { zoom = Math.max(0.45, Math.min(2.1, zoom + e.deltaY * -0.0008)); });
+
+       function dibujarObjeto(obj, cx, cy, fov) {
+    var escO = (fov / (fov + obj.z2)) * zoom;
+    if (escO <= 0.15) { obj.hitBox = null; return; }
+    var sx = cx + obj.x1 * escO, sy = cy + obj.y2 * escO;
+
+    ctx.save();
+    var esHover = (fraseHover === obj);
+    ctx.globalAlpha = esHover ? 1 : (obj.z2 > 180 ? 0.35 : (obj.z2 > 0 ? 0.7 : 1));
+    if (obj.esImg) {
+        var foto = obj.numImg === 1 ? imgOrb1 : (obj.numImg === 2 ? imgOrb2 : imgOrb3);
+        var lado = 48 * escO;
+        if (foto.complete && foto.naturalWidth > 0) {
+            ctx.drawImage(foto, sx - lado / 2, sy - lado / 2, lado, lado);
+        }
+    } else {
+        var escalaTexto = Math.max(0.55, escO) * (esHover ? 1.08 : 1);
+        ctx.font = '400 24px "Dancing Script", cursive';
+        var anchoTexto = ctx.measureText(obj.texto).width * escalaTexto;
+        var altoTexto = 26 * escalaTexto;
+        obj.hitBox = {
+            x1: sx - anchoTexto / 2 - 8,
+            x2: sx + anchoTexto / 2 + 8,
+            y1: sy - altoTexto * 0.85,
+            y2: sy + altoTexto * 0.35
+        };
+        ctx.translate(sx, sy);
+        ctx.scale(escalaTexto, escalaTexto);
+        ctx.textAlign = 'center';
+        ctx.shadowColor = obj.color;
+        ctx.shadowBlur = esHover ? 28 : 12;
+        ctx.fillStyle = obj.color;
+        ctx.fillText(obj.texto, 0, 0);
+        if (esHover) ctx.fillText(obj.texto, 0, 0);
+    }
+    ctx.restore();
+}
+
+        function render() {
+            tiempo += 0.05; if (!arrastrando) rotY += 0.004;
+            ctx.clearRect(0, 0, w, h);
+
+            estrellas.forEach(function(e) {
+                ctx.fillStyle = 'rgba(255,255,255,' + (0.35 + Math.abs(Math.sin(tiempo + e.fase)) * 0.65) + ')';
+                ctx.beginPath(); ctx.arc(e.x, e.y, e.r, 0, Math.PI * 2); ctx.fill();
+            });
+
+            var cx = w / 2, cy = h / 2, cosY = Math.cos(rotY), sinY = Math.sin(rotY), cosX = Math.cos(rotX), sinX = Math.sin(rotX), fov = 780;
+
+                        // Efecto neón azul eléctrico súper brillante sin lag
+            ctx.save();
+            ctx.globalCompositeOperation = 'lighter';
+                        // Dibujo de la galaxia (Violeta dentro -> Azul medio -> Blanco fuera) + Letra "A"
+            ctx.save();
+            ctx.globalCompositeOperation = 'lighter';
+            anillo.forEach(function(p) {
+                var x1 = p.x * cosY - p.z * sinY, z1 = p.z * cosY + p.x * sinY, y2 = p.y * cosX - z1 * sinX, z2 = z1 * cosX + p.y * sinX;
+                var esc = (fov / (fov + z2)) * zoom;
+                if (esc <= 0.1) return;
+                var sx = cx + x1 * esc, sy = cy + y2 * esc, r = (p.esLetra ? 1.8 : 1.4) * esc;
+
+                if (p.esLetra) {
+                    // LETRA "A" DE AMBAR: Brillo blanco cian súper nítido
+                    ctx.fillStyle = 'rgba(0, 210, 255, 0.45)';
+                    ctx.fillRect(sx - r * 2.5, sy - r * 2.5, r * 5, r * 5);
+                    ctx.fillStyle = 'rgba(255, 255, 255, 1)';
+                    ctx.fillRect(sx - r, sy - r, r * 2, r * 2);
+                } else if (p.borde > 0.42) {
+                    // POR FUERA (Bordes): Blanco plateado brillante
+                    ctx.fillStyle = 'rgba(140, 225, 255, 0.35)';
+                    ctx.fillRect(sx - r * 2.2, sy - r * 2.2, r * 4.4, r * 4.4);
+                    ctx.fillStyle = 'rgba(255, 255, 255, 0.95)';
+                    ctx.fillRect(sx - r, sy - r, r * 2, r * 2);
+                } else if (p.borde > 0.16) {
+                    // EN MEDIO: Tu azul eléctrico y cian intenso
+                    ctx.fillStyle = 'rgba(0, 145, 255, 0.34)';
+                    ctx.fillRect(sx - r * 2.3, sy - r * 2.3, r * 4.6, r * 4.6);
+                    ctx.fillStyle = 'rgba(92, 240, 255, 0.88)';
+                    ctx.fillRect(sx - r, sy - r, r * 2, r * 2);
+                } else {
+                    // POR DENTRO (Núcleo del brazo): Violeta amatista
+                    ctx.fillStyle = 'rgba(165, 85, 255, 0.42)';
+                    ctx.fillRect(sx - r * 2.4, sy - r * 2.4, r * 4.8, r * 4.8);
+                    ctx.fillStyle = 'rgba(215, 165, 255, 0.95)';
+                    ctx.fillRect(sx - r, sy - r, r * 2, r * 2);
+                }
+            });
+            ctx.restore();
+
+            var atras = new Set();
+            var adelante = new Set();
+            objetos3D.forEach(function(obj) {
+                obj.x1 = obj.x * cosY - obj.z * sinY;
+                var z1 = obj.z * cosY + obj.x * sinY;
+                obj.y2 = obj.y * cosX - z1 * sinX;
+                obj.z2 = z1 * cosX + obj.y * sinX;
+                if (obj.z2 > 0) atras.add(obj);
+                else adelante.add(obj);
+            });
+
+            atras.forEach(function(obj) { dibujarObjeto(obj, cx, cy, fov); });
+
+                        var tamCentro = (165 + Math.sin(tiempo) * 7) * zoom;
+            ctx.save();
+            ctx.globalCompositeOperation = 'source-over';
+            ctx.shadowBlur = 0;
+            if (imgCentro.complete && imgCentro.naturalWidth > 0) {
+                ctx.drawImage(imgCentro, cx - tamCentro / 2, cy - tamCentro * 0.62, tamCentro, tamCentro);
+            }
+            ctx.restore();
+
+            adelante.forEach(function(obj) { dibujarObjeto(obj, cx, cy, fov); });
+
+            requestAnimationFrame(render);
+        }
+        render();
+                (function crearIconoEmilia() {
+            var canvasIco = document.createElement('canvas');
+            canvasIco.width = 64; canvasIco.height = 64;
+            var ctxIco = canvasIco.getContext('2d');
+            ctxIco.beginPath(); ctxIco.arc(32, 29, 28, Math.PI, 0); ctxIco.lineTo(61, 62); ctxIco.lineTo(3, 62); ctxIco.closePath();
+            ctxIco.fillStyle = '#f1f2f6'; ctxIco.fill();
+            ctxIco.beginPath(); ctxIco.arc(32, 36, 20, 0, Math.PI * 2); ctxIco.fillStyle = '#ffe5d9'; ctxIco.fill();
+            ctxIco.beginPath(); ctxIco.moveTo(11, 30); ctxIco.quadraticCurveTo(32, 10, 53, 30); ctxIco.quadraticCurveTo(40, 24, 32, 30); ctxIco.quadraticCurveTo(24, 24, 11, 30); ctxIco.fillStyle = '#ffffff'; ctxIco.fill();
+            ctxIco.beginPath(); ctxIco.moveTo(10, 14); ctxIco.lineTo(21, 18); ctxIco.lineTo(15, 26); ctxIco.closePath(); ctxIco.fillStyle = '#ffffff'; ctxIco.fill(); ctxIco.strokeStyle = '#8c7ae6'; ctxIco.lineWidth = 2; ctxIco.stroke();
+            ctxIco.beginPath(); ctxIco.ellipse(23, 37, 3.5, 4.8, 0, 0, Math.PI * 2); ctxIco.fillStyle = '#6c5ce7'; ctxIco.fill();
+            ctxIco.beginPath(); ctxIco.moveTo(36, 37); ctxIco.quadraticCurveTo(41, 32, 46, 37); ctxIco.strokeStyle = '#6c5ce7'; ctxIco.lineWidth = 3; ctxIco.lineCap = 'round'; ctxIco.stroke();
+            ctxIco.beginPath(); ctxIco.arc(32, 45, 3.8, 0.1 * Math.PI, 0.9 * Math.PI); ctxIco.strokeStyle = '#ff7675'; ctxIco.lineWidth = 2.5; ctxIco.stroke();
+            document.getElementById('favicon-emilia').href = canvasIco.toDataURL('image/png');
+        })();
+    </script>
+    <div id="modalFrase" class="modal-overlay" onclick="cerrarCarta()">
+  <div class="carta-frase" id="cartaContenido">
+    <h3 id="cartaTitulo"></h3>
+    <p id="cartaTexto" style="margin: 0;"></p>
+  </div>
+</div>
+</body>
+</html>

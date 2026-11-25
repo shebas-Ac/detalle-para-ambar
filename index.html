@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>con mucho cariño para ti ambar🤍</title>
+    <link id="favicon-emilia" rel="icon" type="image/png" href="">
+    <link rel="preconnect" href="https://googleapis.com">
+    <link rel="preconnect" href="https://gstatic.com" crossorigin>
+    <link href="https://googleapis.com/css2?family=Cinzel:wght@600;700;800&family=Cormorant+Garamond:ital,wght@0,600;0,700;1,600&display=swap" rel="stylesheet">
+    <link href="https://googleapis.com" rel="stylesheet">
+    <style>
+        .copo-nieve {
+  position: absolute;
+  top: -12px;
+  background: radial-gradient(circle, #ffffff 0%, #d4f6ff 65%, transparent 100%);
+  border-radius: 50%;
+  box-shadow: 0 0 8px #a5f3fc;
+  pointer-events: none;
+  animation: caerNieveEmilia linear infinite;
+}
+
+@keyframes caerNieveEmilia {
+  0% { transform: translateY(0) translateX(0); }
+  50% { transform: translateY(52vh) translateX(18px); }
+  100% { transform: translateY(105vh) translateX(-12px); }
+}
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            min-height: 100vh;
+            background: radial-gradient(circle at center, #0a1931 0%, #040b18 70%, #02050a 100%);
+            font-family: 'Cinzel', serif;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            color: white;
+        }
+        #espiritus-fondo { position: fixed; inset: 0; pointer-events: none; z-index: 1; }
+        .orbe {
+            position: absolute; border-radius: 50%;
+            background: radial-gradient(circle, #ffffff 15%, #5ce1e6 55%, rgba(0, 168, 255, 0) 75%);
+            box-shadow: 0 0 12px #5ce1e6, 0 0 26px #00a8ff;
+            opacity: 0.9;
+            animation: flotarOrbe 4s ease-in-out infinite alternate;
+        }
+        @keyframes flotarOrbe {
+            0% { transform: translate(0px, 0px) scale(0.95); opacity: 0.6; }
+            100% { transform: translate(12px, -22px) scale(1.15); opacity: 1; }
+        }
+        #escena1 { position: relative; z-index: 50; display: flex; flex-direction: column; align-items: center; }
+        .saludo-ambar {
+            font-size: 2.3rem; font-weight: 800; text-transform: uppercase; letter-spacing: 5px;
+            color: #e0f7fa; margin-bottom: 58px; text-align: center;
+            text-shadow: 0 0 10px #ffffff, 0 0 22px #5ce1e6, 0 0 40px #00d2ff, 0 0 65px #0080ff;
+            animation: resplandorTexto 2.5s ease-in-out infinite alternate;
+        }
+        @keyframes resplandorTexto {
+            from { text-shadow: 0 0 8px #ffffff, 0 0 18px #5ce1e6, 0 0 32px #00d2ff; opacity: 0.9; }
+            to { text-shadow: 0 0 14px #ffffff, 0 0 28px #5ce1e6, 0 0 50px #00d2ff, 0 0 75px #0080ff; opacity: 1; }
+        }
+        .btn-escena {
+            background: transparent; border: none; display: flex; flex-direction: column;
+            align-items: center; cursor: pointer; transition: transform 0.3s ease; outline: none;
+        }
+        .btn-escena:hover { transform: scale(1.06); }
+        .regalo-box {
+            position: relative; width: 130px; height: 110px;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            border-radius: 8px; box-shadow: 0 0 35px rgba(92, 225, 230, 0.5);
+            animation: latido 2.2s infinite ease-in-out; display: flex; justify-content: center;
+        }
+        .regalo-box::before {
+            content: ''; position: absolute; width: 24px; height: 100%;
+            background: linear-gradient(to right, #a8edea, #5ce1e6); box-shadow: 0 0 10px #5ce1e6;
+        }
+        .regalo-tapa {
+            position: absolute; top: -18px; left: -8px; width: 146px; height: 28px;
+            background: linear-gradient(135deg, #2a5298 0%, #3b6cb7 100%);
+            border-radius: 6px; box-shadow: 0 4px 10px rgba(0,0,0,0.4); z-index: 2;
+        }
+        .regalo-tapa::before {
+            content: ''; position: absolute; left: 50%; transform: translateX(-50%);
+            width: 24px; height: 100%; background: linear-gradient(to right, #a8edea, #5ce1e6);
+        }
+        .regalo-mono { position: absolute; top: -38px; font-size: 2.2rem; filter: drop-shadow(0 0 8px #5ce1e6); z-index: 1; }
+        @keyframes latido {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            25% { transform: translateY(-6px) rotate(-2deg); }
+            75% { transform: translateY(-6px) rotate(2deg); }
+        }
+        .cartel {
+            margin-top: 28px; padding: 12px 30px; background: rgba(10, 25, 49, 0.85);
+            border: 1px solid rgba(92, 225, 230, 0.7); border-radius: 30px; color: #e0f7fa;
+            font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 1.35rem;
+            letter-spacing: 2px; box-shadow: 0 0 20px rgba(92, 225, 230, 0.3); font-weight: 700;
+        }
+        #escena2 {
+            position: fixed; inset: 0; z-index: 80; display: none; flex-direction: column;
+            align-items: center; justify-content: center; padding: 30px; text-align: center; cursor: pointer;
+            animation: difuminarFondo 0.9s ease forwards;
+        }
+        @keyframes difuminarFondo {
+            from { backdrop-filter: blur(0px); -webkit-backdrop-filter: blur(0px); background: rgba(4, 11, 24, 0); }
+            to { backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); background: rgba(4, 11, 24, 0.25); }
+        }
+        .titulo-especial {
+            color: #ffffff; font-size: 2.4rem; font-weight: 700; letter-spacing: 1.5px;
+            text-shadow: 0 0 18px rgba(92, 225, 230, 0.9), 0 3px 12px rgba(0, 0, 0, 0.7);
+            max-width: 720px; line-height: 1.45;
+            animation: subirTitulo 1s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+        }
+        @keyframes subirTitulo {
+            from { opacity: 0; transform: translateY(30px) scale(0.94); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        .indicio-continuar {
+            margin-top: 40px; font-family: 'Cormorant Garamond', serif; font-style: italic;
+            font-size: 1.25rem; color: #a8edea; letter-spacing: 2px;
+            opacity: 0; animation: aparecerAviso 0.8s ease 0.8s forwards, parpadeo 1.8s infinite alternate 1.6s;
+        }
+        @keyframes aparecerAviso { to { opacity: 0.9; } }
+        @keyframes parpadeo { from { opacity: 0.35; } to { opacity: 1; } }
+    </style>
+</head>
+<body>
+    <div id="espiritus-fondo"></div>
+
+    <div id="escena1">
+        <div class="saludo-ambar">HOLI AMBAR</div>
+        <audio id="musica-fondo" src="musica.mp3" loop></audio>
+<button type="button" class="btn-escena" onclick="var m=document.getElementById('musica-fondo'); m.volume=0.08; m.play(); document.getElementById('escena2').style.display='flex'">
+            <div class="regalo-box">
+                <div class="regalo-mono">🎀</div>
+                <div class="regalo-tapa"></div>
+            </div>
+            <span class="cartel">toca el regalo</span>
+        </button>
+    </div>
+
+               <div id="escena2" style="transition: opacity 1.1s ease;" onclick="if(this.dataset.saliendo)return; this.dataset.saliendo='1'; var e1=document.getElementById('escena1'); e1.style.transition='opacity 0.9s ease'; e1.style.opacity='0'; this.style.opacity='0'; var marco=document.createElement('iframe'); marco.src='galaxia.html?sinmusica=1'; marco.style.cssText='position:fixed;inset:0;width:100%;height:100%;border:none;z-index:5;opacity:0;transition:opacity 1.3s ease;'; document.body.appendChild(marco); setTimeout(function(){ e1.style.display='none'; marco.style.opacity='1'; }, 450); setTimeout(function(){ document.getElementById('escena2').style.display='none'; }, 1250);">
+
+        <h1 class="titulo-especial" style="font-family: 'Dancing Script', cursive; font-weight: 400; font-size: 3.2rem;">Razones por las que eres muy especial para mí</h1>
+        <span class="indicio-continuar">toca para descubrirlo</span>
+          <div id="nieve-emilia" style="position:fixed; inset:0; pointer-events:none; overflow:hidden; z-index:2;"></div>
+    </div>
+
+    <script>
+        var fondo = document.getElementById('espiritus-fondo');
+        for (var i = 0; i < 75; i++) {
+            var orbe = document.createElement('div');
+            orbe.className = 'orbe';
+            var tam = Math.random() * 9 + 8;
+            orbe.style.width = tam + 'px';
+            orbe.style.height = tam + 'px';
+            orbe.style.left = (Math.random() * 98) + '%';
+            orbe.style.top = (Math.random() * 98) + '%';
+            orbe.style.animationDuration = (Math.random() * 2 + 3.2) + 's';
+            orbe.style.animationDelay = (Math.random() * 2) + 's';
+            fondo.appendChild(orbe);
+        }
+var contenedorNieve = document.getElementById('nieve-emilia');
+for (var n = 0; n < 50; n++) {
+  var copo = document.createElement('div');
+  copo.className = 'copo-nieve';
+  var tamCopo = (Math.random() * 4.5 + 2.5).toFixed(1) + 'px';
+  copo.style.width = tamCopo;
+  copo.style.height = tamCopo;
+  copo.style.left = (Math.random() * 100).toFixed(2) + '%';
+  copo.style.opacity = (Math.random() * 0.55 + 0.35).toFixed(2);
+  copo.style.animationDuration = (Math.random() * 6 + 6).toFixed(1) + 's';
+  copo.style.animationDelay = (-Math.random() * 10).toFixed(1) + 's';
+  contenedorNieve.appendChild(copo);
+}
+        (function crearIconoEmilia() {
+            var canvas = document.createElement('canvas');
+            canvas.width = 64; canvas.height = 64;
+            var ctx = canvas.getContext('2d');
+            ctx.beginPath(); ctx.arc(32, 29, 28, Math.PI, 0); ctx.lineTo(61, 62); ctx.lineTo(3, 62); ctx.closePath();
+            ctx.fillStyle = '#f1f2f6'; ctx.fill();
+            ctx.beginPath(); ctx.arc(32, 36, 20, 0, Math.PI * 2); ctx.fillStyle = '#ffe5d9'; ctx.fill();
+            ctx.beginPath(); ctx.moveTo(11, 30); ctx.quadraticCurveTo(32, 10, 53, 30); ctx.quadraticCurveTo(40, 24, 32, 30); ctx.quadraticCurveTo(24, 24, 11, 30); ctx.fillStyle = '#ffffff'; ctx.fill();
+            ctx.beginPath(); ctx.moveTo(10, 14); ctx.lineTo(21, 18); ctx.lineTo(15, 26); ctx.closePath(); ctx.fillStyle = '#ffffff'; ctx.fill(); ctx.strokeStyle = '#8c7ae6'; ctx.lineWidth = 2; ctx.stroke();
+            ctx.beginPath(); ctx.ellipse(23, 37, 3.5, 4.8, 0, 0, Math.PI * 2); ctx.fillStyle = '#6c5ce7'; ctx.fill();
+            ctx.beginPath(); ctx.moveTo(36, 37); ctx.quadraticCurveTo(41, 32, 46, 37); ctx.strokeStyle = '#6c5ce7'; ctx.lineWidth = 3; ctx.lineCap = 'round'; ctx.stroke();
+            ctx.beginPath(); ctx.arc(32, 45, 3.8, 0.1 * Math.PI, 0.9 * Math.PI); ctx.strokeStyle = '#ff7675'; ctx.lineWidth = 2.5; ctx.stroke();
+            document.getElementById('favicon-emilia').href = canvas.toDataURL('image/png');
+        })();
+    </script>
+</body>
+</html>
